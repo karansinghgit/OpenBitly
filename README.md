@@ -8,6 +8,8 @@ to that code is recorded so you can see how many times a link was clicked.
 - **Storage** — SQLite.
 - **Deployment** — Docker Compose with Gunicorn behind Caddy.
 
+<img width="1229" height="386" alt="image" src="https://github.com/user-attachments/assets/2ed7715b-6d63-490c-a5d9-e0e2720dec6c" />
+
 > **Note: ** Since this is a take-home, I committed straight
 > to `main` to keep a clean, linear, easy-to-review history. In a real project
 > I'd use short-lived feature branches behind pull requests
