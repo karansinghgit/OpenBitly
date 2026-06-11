@@ -1,0 +1,36 @@
+services:
+  app:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      # Override these for a real deployment (e.g. via an .env file).
+      DJANGO_DEBUG: "False"
+      DJANGO_ALLOWED_HOSTS: "${DJANGO_ALLOWED_HOSTS:-*}"
+      DJANGO_SECRET_KEY: "${DJANGO_SECRET_KEY:-django-insecure-7%#zvh2x(g_c#6@&e^kwa=+t5@(a0+d2_ycpbdl_6nf(*aue8=}"
+      DJANGO_CSRF_TRUSTED_ORIGINS: "${DJANGO_CSRF_TRUSTED_ORIGINS:-}"
+      # Keep the SQLite file on a named volume so it survives rebuilds.
+      SQLITE_PATH: "/data/db.sqlite3"
+    volumes:
+      - sqlite_data:/data
+    expose:
+      - "8000"
+
+  caddy:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - app
+    environment:
+      # Set to your domain for automatic HTTPS; defaults to plain HTTP on :80.
+      SITE_ADDRESS: "${SITE_ADDRESS:-:80}"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  sqlite_data:
+  caddy_data:
+  caddy_config:

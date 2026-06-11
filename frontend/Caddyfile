@@ -1,0 +1,31 @@
+# SITE_ADDRESS controls the listener. Defaults to :80 for a plain local
+# deploy; set it to your domain (e.g. short.example.com) and Caddy will
+# obtain and renew TLS certificates automatically.
+{$SITE_ADDRESS::80} {
+	encode gzip
+
+	# API, admin and Django's own static files go to Gunicorn.
+	@django path /api/* /admin/* /static/*
+	handle @django {
+		reverse_proxy app:8000
+	}
+
+	# The React single-page app lives at the root.
+	handle / {
+		root * /srv
+		file_server
+	}
+
+	# Hashed build assets and other static files shipped with the SPA.
+	@assets path /assets/* *.svg *.png *.ico *.webmanifest *.json *.txt
+	handle @assets {
+		root * /srv
+		file_server
+	}
+
+	# Anything else is treated as a short code and proxied to Django's
+	# redirect view (which 302s or returns 404).
+	handle {
+		reverse_proxy app:8000
+	}
+}

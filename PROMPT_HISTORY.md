@@ -45,3 +45,9 @@ A verbatim log of the prompts driving development of openbitly, in chronological
 ## 6
 
 > Next, I want you to add a test suite with Django's test framework. Add test cases for all the APIs that we have. Add test cases for the base62 URL shortener business logic, and make sure you keep the tests short and readable
+
+---
+
+## 7
+
+> I want you to now containerize the application for a server deployment. There should be a Dockerfile added that runs Django with Gunicorn, and add a docker-compose file that will have the app as well as Caddy in front of it. I'll be using Caddy to serve the React build as well as proxy API routes to Django. Apart from that, I should just be able to docker-compose up to deploy and also keep the SQLite on a separate volume.
