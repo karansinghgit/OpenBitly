@@ -17,3 +17,11 @@ A verbatim log of the prompts driving development of openbitly, in chronological
 > - There should be a prominent form right below it.
 > - Below that, there should be a list of the links, showing the short link as well as the destination.
 > Later I'll also ask you to add a click count, but let's just tackle that a little later. Overall, the system should be responsive and should work well on mobile. Try not to add too many new dependencies; just try to keep it simple.
+
+---
+
+## 3
+
+> I would like to improve how the front end currently looks. It should have a more premium feel. I prefer to use a color that pops out. We can go ahead with something like neon green along with monochromatic colors like black and white. Let's try to experiment.
+
+> reject URLs pointing back at our own host to avoid any loops
