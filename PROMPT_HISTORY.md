@@ -51,3 +51,11 @@ A verbatim log of the prompts driving development of openbitly, in chronological
 ## 7
 
 > I want you to now containerize the application for a server deployment. There should be a Dockerfile added that runs Django with Gunicorn, and add a docker-compose file that will have the app as well as Caddy in front of it. I'll be using Caddy to serve the React build as well as proxy API routes to Django. Apart from that, I should just be able to docker-compose up to deploy and also keep the SQLite on a separate volume.
+
+---
+
+## 8
+
+> add a simple readme summarizing the application.
+>
+> add a design decision section that i will be adding to as well as instructions to clone and run locally if needed.
