@@ -39,3 +39,9 @@ A verbatim log of the prompts driving development of openbitly, in chronological
 > add the click count to the UI and add the appropriate API for that
 >
 > meanwhile, also make the page light mode. use black in some places for contrast.
+
+---
+
+## 6
+
+> Next, I want you to add a test suite with Django's test framework. Add test cases for all the APIs that we have. Add test cases for the base62 URL shortener business logic, and make sure you keep the tests short and readable
