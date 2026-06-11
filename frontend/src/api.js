@@ -1,5 +1,7 @@
-export async function listLinks() {
-  const res = await fetch('/api/links')
+export async function listLinks(codes) {
+  if (!codes.length) return []
+  const query = codes.map(encodeURIComponent).join(',')
+  const res = await fetch(`/api/links?codes=${query}`)
   const data = await res.json()
   if (!res.ok) {
     throw new Error(data.error || 'Could not load links')

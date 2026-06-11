@@ -40,12 +40,19 @@ def shorten(request):
 
 @require_GET
 def links(request):
-    qs = (
-        Link.objects.annotate(click_count=Count("clicks"))
-        .order_by("-created_at")
-    )
+    # Scoped to the codes the caller created (kept in their browser's
+    # localStorage). There are no accounts, so the browser is the only thing
+    # that knows which links are "mine"; the DB stays the source of truth.
+    codes = [c for c in request.GET.get("codes", "").split(",") if c]
+    if not codes:
+        return JsonResponse({"links": []})
+
+    qs = Link.objects.filter(code__in=codes).annotate(click_count=Count("clicks"))
+    by_code = {link.code: link for link in qs}
+    # Preserve the order the browser sent (newest first).
+    ordered = [by_code[c] for c in codes if c in by_code]
     return JsonResponse(
-        {"links": [_serialize(link, request, link.click_count) for link in qs]}
+        {"links": [_serialize(link, request, link.click_count) for link in ordered]}
     )
 
 @require_GET

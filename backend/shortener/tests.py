@@ -47,19 +47,32 @@ class ShortenApiTests(TestCase):
 
 
 class LinksApiTests(TestCase):
-    def test_links_lists_newest_first_with_click_counts(self):
+    def test_links_returns_requested_codes_in_order_with_counts(self):
         old = Link.objects.create(code="old", long_url="https://a.com")
-        new = Link.objects.create(code="new", long_url="https://b.com")
+        Link.objects.create(code="new", long_url="https://b.com")
         Click.objects.create(link=old)
         Click.objects.create(link=old)
 
-        res = self.client.get("/api/links")
+        # The browser sends its codes (newest first) from localStorage.
+        res = self.client.get("/api/links?codes=new,old")
         self.assertEqual(res.status_code, 200)
         links = res.json()["links"]
 
         self.assertEqual([l["code"] for l in links], ["new", "old"])
         counts = {l["code"]: l["click_count"] for l in links}
         self.assertEqual(counts, {"new": 0, "old": 2})
+
+    def test_links_is_scoped_to_requested_codes(self):
+        Link.objects.create(code="mine", long_url="https://a.com")
+        Link.objects.create(code="theirs", long_url="https://b.com")
+
+        res = self.client.get("/api/links?codes=mine")
+        self.assertEqual([l["code"] for l in res.json()["links"]], ["mine"])
+
+    def test_links_empty_without_codes(self):
+        Link.objects.create(code="x", long_url="https://a.com")
+        res = self.client.get("/api/links")
+        self.assertEqual(res.json()["links"], [])
 
 
 class ResolveTests(TestCase):

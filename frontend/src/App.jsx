@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { listLinks, shorten } from './api'
+import { addCode, getCodes } from './lib/storage'
 import './App.css'
 
 function App() {
@@ -9,7 +10,7 @@ function App() {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    listLinks()
+    listLinks(getCodes())
       .then(setLinks)
       .catch((err) => setError(err.message))
   }, [])
@@ -20,6 +21,7 @@ function App() {
     setSubmitting(true)
     try {
       const link = await shorten(url)
+      addCode(link.code)
       setLinks([link, ...links])
       setUrl('')
     } catch (err) {
@@ -34,7 +36,7 @@ function App() {
       <header className="header">
         <div className="header__inner">
           <span className="logo">
-            open<span className="logo__accent">bit.ly</span>
+            open<span className="logo__accent">bitly</span>
           </span>
           <span className="tagline">Shorten links in a click</span>
         </div>
