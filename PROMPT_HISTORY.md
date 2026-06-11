@@ -25,3 +25,9 @@ A verbatim log of the prompts driving development of openbitly, in chronological
 > I would like to improve how the front end currently looks. It should have a more premium feel. I prefer to use a color that pops out. We can go ahead with something like neon green along with monochromatic colors like black and white. Let's try to experiment.
 
 > reject URLs pointing back at our own host to avoid any loops
+
+---
+
+## 4
+
+> I want you to add click analytics to create a click model where every row will be mapped to a visit with a foreign key to the link. Let's add the timestamp, the refer, and the user agent, and we'll do this in a separate table rather than a counter column. I want you to record the click inside the redirect view synchronously, but just add a comment over there in case we ever need to move it into a queue if the redirect API is seeing heavy traffic

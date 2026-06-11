@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
-from .models import Link
+from .models import Click, Link
 from .helpers import unique_code
 
 @csrf_exempt
@@ -35,4 +35,15 @@ def shorten(request):
 def resolve(request, code):
     # 302 (not 301) so repeat visits don't get cached
     link = get_object_or_404(Link, code=code)
+
+    # Record the visit synchronously, before redirecting. This is fine at
+    # current traffic, but if the redirect path ever becomes hot this insert
+    # should be pushed onto a queue (e.g. Celery/SQS) so it stays off the
+    # request's critical path.
+    Click.objects.create(
+        link=link,
+        referer=request.META.get("HTTP_REFERER", ""),
+        user_agent=request.META.get("HTTP_USER_AGENT", ""),
+    )
+
     return HttpResponse(status=302, headers={"Location": link.long_url})
