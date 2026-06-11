@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { listLinks, shorten } from './api'
-import { addCode, getCodes } from './lib/storage'
 import './App.css'
 
 function App() {
@@ -8,9 +7,10 @@ function App() {
   const [links, setLinks] = useState([])
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [copiedCode, setCopiedCode] = useState('')
 
   useEffect(() => {
-    listLinks(getCodes())
+    listLinks()
       .then(setLinks)
       .catch((err) => setError(err.message))
   }, [])
@@ -21,7 +21,6 @@ function App() {
     setSubmitting(true)
     try {
       const link = await shorten(url)
-      addCode(link.code)
       setLinks([link, ...links])
       setUrl('')
     } catch (err) {
@@ -31,12 +30,22 @@ function App() {
     }
   }
 
+  async function handleCopy(link) {
+    try {
+      await navigator.clipboard.writeText(link.short_url)
+      setCopiedCode(link.code)
+      setTimeout(() => setCopiedCode(''), 1500)
+    } catch {
+      setError('Could not copy to clipboard')
+    }
+  }
+
   return (
     <div className="page">
       <header className="header">
         <div className="header__inner">
           <span className="logo">
-            open<span className="logo__accent">bitly</span>
+            open<span className="logo__accent">bit.ly</span>
           </span>
           <span className="tagline">Shorten links in a click</span>
         </div>
@@ -69,9 +78,19 @@ function App() {
               {links.map((link) => (
                 <li key={link.code} className="card link">
                   <div className="link__main">
-                    <a className="link__short" href={link.short_url} target="_blank" rel="noreferrer">
-                      {link.short_url}
-                    </a>
+                    <div className="link__short-row">
+                      <a className="link__short" href={link.short_url} target="_blank" rel="noreferrer">
+                        {link.short_url}
+                      </a>
+                      <button
+                        className="link__copy"
+                        type="button"
+                        onClick={() => handleCopy(link)}
+                        title="Copy short URL"
+                      >
+                        {copiedCode === link.code ? 'Copied' : 'Copy'}
+                      </button>
+                    </div>
                     <span className="link__destination" title={link.long_url}>
                       {link.long_url}
                     </span>

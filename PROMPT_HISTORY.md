@@ -59,3 +59,9 @@ A verbatim log of the prompts driving development of openbitly, in chronological
 > add a simple readme summarizing the application.
 >
 > add a design decision section that i will be adding to as well as instructions to clone and run locally if needed.
+
+---
+
+## 9
+
+> can you add a copy button next to each url to make it easy to test the functionality for an end user?

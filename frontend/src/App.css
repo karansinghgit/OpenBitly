@@ -164,6 +164,12 @@
   flex: 1;
 }
 
+.link__short-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
 .link__short {
   font-weight: 700;
   font-size: 1rem;
@@ -174,6 +180,24 @@
 
 .link__short:hover {
   text-decoration: underline;
+}
+
+.link__copy {
+  flex-shrink: 0;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface-muted);
+  border: 1px solid var(--border-strong);
+  border-radius: 7px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.link__copy:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .link__destination {
