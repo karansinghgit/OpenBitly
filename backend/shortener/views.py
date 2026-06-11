@@ -1,8 +1,9 @@
 import json
 
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from .models import Link
 from .helpers import unique_code
@@ -21,3 +22,9 @@ def shorten(request):
         {"code": link.code, "short_url": short_url, "long_url": link.long_url},
         status=201,
     )
+
+@require_GET
+def resolve(request, code):
+    # 302 (not 301) so repeat visits don't get cached
+    link = get_object_or_404(Link, code=code)
+    return HttpResponse(status=302, headers={"Location": link.long_url})
