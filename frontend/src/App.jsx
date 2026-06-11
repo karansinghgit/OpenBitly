@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { shorten } from './api'
+import { useEffect, useState } from 'react'
+import { listLinks, shorten } from './api'
 import './App.css'
 
 function App() {
@@ -7,6 +7,12 @@ function App() {
   const [links, setLinks] = useState([])
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    listLinks()
+      .then(setLinks)
+      .catch((err) => setError(err.message))
+  }, [])
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -60,11 +66,17 @@ function App() {
             <ul className="links__list">
               {links.map((link) => (
                 <li key={link.code} className="card link">
-                  <a className="link__short" href={link.short_url} target="_blank" rel="noreferrer">
-                    {link.short_url}
-                  </a>
-                  <span className="link__destination" title={link.long_url}>
-                    {link.long_url}
+                  <div className="link__main">
+                    <a className="link__short" href={link.short_url} target="_blank" rel="noreferrer">
+                      {link.short_url}
+                    </a>
+                    <span className="link__destination" title={link.long_url}>
+                      {link.long_url}
+                    </span>
+                  </div>
+                  <span className="link__clicks" title="Total clicks">
+                    <strong>{link.click_count}</strong>
+                    {link.click_count === 1 ? ' click' : ' clicks'}
                   </span>
                 </li>
               ))}

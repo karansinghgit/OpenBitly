@@ -31,3 +31,11 @@ A verbatim log of the prompts driving development of openbitly, in chronological
 ## 4
 
 > I want you to add click analytics to create a click model where every row will be mapped to a visit with a foreign key to the link. Let's add the timestamp, the refer, and the user agent, and we'll do this in a separate table rather than a counter column. I want you to record the click inside the redirect view synchronously, but just add a comment over there in case we ever need to move it into a queue if the redirect API is seeing heavy traffic
+
+---
+
+## 5
+
+> add the click count to the UI and add the appropriate API for that
+>
+> meanwhile, also make the page light mode. use black in some places for contrast.

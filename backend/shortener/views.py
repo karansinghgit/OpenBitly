@@ -1,6 +1,7 @@
 import json
 from urllib.parse import urlparse
 
+from django.db.models import Count
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -8,6 +9,15 @@ from django.views.decorators.http import require_GET, require_POST
 
 from .models import Click, Link
 from .helpers import unique_code
+
+
+def _serialize(link, request, click_count=0):
+    return {
+        "code": link.code,
+        "short_url": f"{request.scheme}://{request.get_host()}/{link.code}",
+        "long_url": link.long_url,
+        "click_count": click_count,
+    }
 
 @csrf_exempt
 @require_POST
@@ -25,10 +35,17 @@ def shorten(request):
         )
 
     link = Link.objects.create(code=unique_code(), long_url=url)
-    short_url = f"{request.scheme}://{request.get_host()}/{link.code}"
+    return JsonResponse(_serialize(link, request), status=201)
+
+
+@require_GET
+def links(request):
+    qs = (
+        Link.objects.annotate(click_count=Count("clicks"))
+        .order_by("-created_at")
+    )
     return JsonResponse(
-        {"code": link.code, "short_url": short_url, "long_url": link.long_url},
-        status=201,
+        {"links": [_serialize(link, request, link.click_count) for link in qs]}
     )
 
 @require_GET
