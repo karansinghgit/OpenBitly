@@ -65,3 +65,11 @@ A verbatim log of the prompts driving development of openbitly, in chronological
 ## 9
 
 > can you add a copy button next to each url to make it easy to test the functionality for an end user?
+
+---
+
+## 10
+
+> can you also add the ability to add an alias, in case users wanted to use an alias?
+>
+> Keep it optional; fall back to a random code if none is provided. Also validate it, and if it's already taken, then return a 400-range error. H

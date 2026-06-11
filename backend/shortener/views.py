@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
 from .models import Click, Link
-from .helpers import unique_code
+from .helpers import is_valid_alias, unique_code
 
 
 def _serialize(link, request, click_count=0):
@@ -34,7 +34,22 @@ def shorten(request):
             {"error": "URL cannot point back at this service"}, status=400
         )
 
-    link = Link.objects.create(code=unique_code(), long_url=url)
+    # Optional custom alias; fall back to a random code when none is given.
+    alias = (data.get("alias") or "").strip()
+    if alias:
+        if not is_valid_alias(alias):
+            return JsonResponse(
+                {"error": "alias may only contain letters, numbers, hyphens and "
+                          "underscores (max 10 characters)"},
+                status=400,
+            )
+        if Link.objects.filter(code=alias).exists():
+            return JsonResponse({"error": "alias is already taken"}, status=409)
+        code = alias
+    else:
+        code = unique_code()
+
+    link = Link.objects.create(code=code, long_url=url)
     return JsonResponse(_serialize(link, request), status=201)
 
 

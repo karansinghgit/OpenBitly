@@ -65,7 +65,17 @@
 
 .form {
   display: flex;
+  flex-direction: column;
   gap: 0.6rem;
+}
+
+.form__row {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.form__input--alias {
+  font-size: 0.92rem;
 }
 
 .form__input {
@@ -224,7 +234,7 @@
 
 /* Mobile */
 @media (max-width: 540px) {
-  .form {
+  .form__row {
     flex-direction: column;
   }
 

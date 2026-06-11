@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react'
 import { listLinks, shorten } from './api'
+import { addCode, getCodes } from './lib/storage'
 import './App.css'
 
 function App() {
   const [url, setUrl] = useState('')
+  const [alias, setAlias] = useState('')
   const [links, setLinks] = useState([])
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [copiedCode, setCopiedCode] = useState('')
 
   useEffect(() => {
-    listLinks()
+    listLinks(getCodes())
       .then(setLinks)
       .catch((err) => setError(err.message))
   }, [])
@@ -20,9 +22,11 @@ function App() {
     setError('')
     setSubmitting(true)
     try {
-      const link = await shorten(url)
+      const link = await shorten(url, alias.trim())
+      addCode(link.code)
       setLinks([link, ...links])
       setUrl('')
+      setAlias('')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -45,7 +49,7 @@ function App() {
       <header className="header">
         <div className="header__inner">
           <span className="logo">
-            open<span className="logo__accent">bit.ly</span>
+            open<span className="logo__accent">bitly</span>
           </span>
           <span className="tagline">Shorten links in a click</span>
         </div>
@@ -55,17 +59,27 @@ function App() {
         <section className="card form-card">
           <h1 className="form-card__title">Shorten a new link</h1>
           <form className="form" onSubmit={handleSubmit}>
+            <div className="form__row">
+              <input
+                className="form__input"
+                type="url"
+                required
+                placeholder="Paste a long URL…"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+              />
+              <button className="form__button" type="submit" disabled={submitting}>
+                {submitting ? 'Shortening…' : 'Shorten'}
+              </button>
+            </div>
             <input
-              className="form__input"
-              type="url"
-              required
-              placeholder="Paste a long URL…"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
+              className="form__input form__input--alias"
+              type="text"
+              placeholder="Custom alias (optional)"
+              value={alias}
+              maxLength={10}
+              onChange={(e) => setAlias(e.target.value)}
             />
-            <button className="form__button" type="submit" disabled={submitting}>
-              {submitting ? 'Shortening…' : 'Shorten'}
-            </button>
           </form>
           {error && <p className="error">{error}</p>}
         </section>

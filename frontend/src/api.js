@@ -9,11 +9,12 @@ export async function listLinks(codes) {
   return data.links
 }
 
-export async function shorten(url) {
+export async function shorten(url, alias) {
+  const body = alias ? { url, alias } : { url }
   const res = await fetch('/api/shorten', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ url }),
+    body: JSON.stringify(body),
   })
   const data = await res.json()
   if (!res.ok) {

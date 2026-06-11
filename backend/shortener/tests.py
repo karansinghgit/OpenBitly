@@ -2,7 +2,7 @@ import json
 
 from django.test import TestCase
 
-from .helpers import BASE_62_SET, generate_code, unique_code
+from .helpers import BASE_62_SET, generate_code, is_valid_alias, unique_code
 from .models import Click, Link
 
 
@@ -19,6 +19,19 @@ class Base62Tests(TestCase):
         # Pre-create every code but one, so unique_code must find the gap.
         Link.objects.create(code="aaa", long_url="https://a.com")
         self.assertNotEqual(unique_code(), "aaa")
+
+
+class AliasValidationTests(TestCase):
+    def test_accepts_url_safe_aliases(self):
+        self.assertTrue(is_valid_alias("my-link_1"))
+
+    def test_rejects_bad_characters_and_length(self):
+        self.assertFalse(is_valid_alias("has space"))
+        self.assertFalse(is_valid_alias("way-too-long-alias"))
+        self.assertFalse(is_valid_alias(""))
+
+    def test_rejects_reserved_names(self):
+        self.assertFalse(is_valid_alias("admin"))
 
 
 class ShortenApiTests(TestCase):
@@ -44,6 +57,22 @@ class ShortenApiTests(TestCase):
         res = self.post({"url": "http://testserver/abc"})
         self.assertEqual(res.status_code, 400)
         self.assertFalse(Link.objects.exists())
+
+    def test_shorten_uses_custom_alias(self):
+        res = self.post({"url": "https://example.com", "alias": "promo"})
+        self.assertEqual(res.status_code, 201)
+        self.assertEqual(res.json()["code"], "promo")
+
+    def test_shorten_rejects_invalid_alias(self):
+        res = self.post({"url": "https://example.com", "alias": "bad alias"})
+        self.assertEqual(res.status_code, 400)
+        self.assertFalse(Link.objects.exists())
+
+    def test_shorten_rejects_taken_alias(self):
+        Link.objects.create(code="promo", long_url="https://a.com")
+        res = self.post({"url": "https://example.com", "alias": "promo"})
+        self.assertEqual(res.status_code, 409)
+        self.assertEqual(Link.objects.filter(code="promo").count(), 1)
 
 
 class LinksApiTests(TestCase):
