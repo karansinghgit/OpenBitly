@@ -1,4 +1,4 @@
-# openbit.ly
+# openbitly
 
 A simple URL shortener. Paste a long URL, get a short code back, and every visit
 to that code is recorded so you can see how many times a link was clicked.
@@ -8,12 +8,24 @@ to that code is recorded so you can see how many times a link was clicked.
 - **Storage** — SQLite.
 - **Deployment** — Docker Compose with Gunicorn behind Caddy.
 
+> **Note: ** Since this is a take-home, I committed straight
+> to `main` to keep a clean, linear, easy-to-review history. In a real project
+> I'd use short-lived feature branches behind pull requests
+> A few other things I'd add in production but left
+> out of scope here:
+>
+> - **Accounts + per-user ownership** instead of the localStorage-only scoping.
+> - **Postgres** once there are concurrent writers or multiple app instances.
+> - **Rate limiting / abuse protection** on the shorten endpoint.
+> - **Automated backups + a CI/CD deploy pipeline** rather than a manual
+>   `docker compose up`.
+
 ## API
 
 | Method | Path            | Description                                              |
 | ------ | --------------- | -------------------------------------------------------- |
 | `POST` | `/api/shorten`  | Create a short link. Body: `{ "url": "https://..." }`.   |
-| `GET`  | `/api/links`    | List all links, newest first, each with a click count.  |
+| `GET`  | `/api/links?codes=a,b` | List the given codes' links (the browser's own), with click counts. |
 | `GET`  | `/<code>`       | Redirect (302) to the original URL and record the click. |
 
 ## Project layout
@@ -41,6 +53,12 @@ docker-compose.yml   app (Gunicorn) + Caddy
 - **Caddy serves the React build and proxies the API.** One origin in front of
   everything: static SPA at `/`, API/admin proxied to Django, and any other path
   treated as a short code and forwarded to the redirect view.
+- **"My links" is a per-browser list, not accounts.** The browser keeps the
+  codes it created in `localStorage`; the database is the source of truth and a
+  link is never deleted by the client. Clearing `localStorage` only empties that
+  browser's dashboard — the links still resolve. Cross-device history would need
+  accounts.
+
 
 ## Run locally
 
